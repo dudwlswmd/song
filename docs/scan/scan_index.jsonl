@@ -1,0 +1,11 @@
+{"id":"scan_temp-js-hashId-babd57e0","file":"scan_temp.js","function":"hashId","summary":"함수 hashId을 수행합니다.","created_at":"2025-07-01T16:14:27.385Z","source":"scan_mod@v1.0"}
+{"id":"scan_temp-js-getAllFiles-2f6982bf","file":"scan_temp.js","function":"getAllFiles","summary":"함수 getAllFiles을 수행합니다.","created_at":"2025-07-01T16:14:27.387Z","source":"scan_mod@v1.0"}
+{"id":"src-App-js-App-847d572f","file":"src/App.js","function":"App","summary":"함수 App을 수행합니다.","created_at":"2025-07-01T16:14:27.388Z","source":"scan_mod@v1.0"}
+{"id":"src-layouts-Footer-js-Footer-9ba21e63","file":"src/layouts/Footer.js","function":"Footer","summary":"React 컴포넌트 Footer를 정의합니다.","created_at":"2025-07-01T16:14:27.389Z","source":"scan_mod@v1.0"}
+{"id":"src-layouts-Header-js-Header-972effd4","file":"src/layouts/Header.js","function":"Header","summary":"React 컴포넌트 Header를 정의합니다.","created_at":"2025-07-01T16:14:27.390Z","source":"scan_mod@v1.0"}
+{"id":"src-pages-About-js-About-4099a600","file":"src/pages/About.js","function":"About","summary":"React 컴포넌트 About를 정의합니다.","created_at":"2025-07-01T16:14:27.390Z","source":"scan_mod@v1.0"}
+{"id":"src-pages-Contact-js-Contact-7c1e00ef","file":"src/pages/Contact.js","function":"Contact","summary":"React 컴포넌트 Contact를 정의합니다.","created_at":"2025-07-01T16:14:27.390Z","source":"scan_mod@v1.0"}
+{"id":"src-pages-Home-js-Home-9fb1b7b9","file":"src/pages/Home.js","function":"Home","summary":"React 컴포넌트 Home를 정의합니다.","created_at":"2025-07-01T16:14:27.390Z","source":"scan_mod@v1.0"}
+{"id":"src-pages-룰-js-Main-effed2c7","file":"src/pages/룰.js","function":"Main","summary":"함수 Main을 수행합니다.","created_at":"2025-07-01T16:14:27.390Z","source":"scan_mod@v1.0"}
+{"id":"src-pages-룰-js-RullClass-075e7a03","file":"src/pages/룰.js","function":"RullClass","summary":"React 컴포넌트 RullClass를 정의합니다.","created_at":"2025-07-01T16:14:27.390Z","source":"scan_mod@v1.0"}
+{"id":"src-pages-룰-js-RullHook-7fb1ded2","file":"src/pages/룰.js","function":"RullHook","summary":"React 컴포넌트 RullHook를 정의합니다.","created_at":"2025-07-01T16:14:27.391Z","source":"scan_mod@v1.0"}

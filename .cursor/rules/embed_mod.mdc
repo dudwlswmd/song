@@ -1,0 +1,80 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+rule type: agent request
+---
+title: "Embed Mode (Cursor-Only)"
+module: universal
+
+keywords:
+  - embed
+  - 임베딩모드
+  - summary export
+
+trigger:
+  matchAny:
+    - "임베딩모드"
+    - "embed mode"
+
+description: >
+  scan_mod에서 수집한 summary를 기반으로, AI 학습과 검색이 용이한 메타데이터 구조를 생성합니다.
+  외부 API를 호출하지 않으며, summary/파일/함수 이름 등을 docs/scan/repo_index.jsonl 에 저장합니다.
+  작업 중단 시 embed_progress.json을 기반으로 이어서 실행할 수 있습니다.
+---
+
+onTrigger:
+  - name: prepareEmbeddings
+    run: |
+      const fs = require("fs")
+      const path = require("path")
+
+      const scanPath = "docs/scan/scan_index.jsonl"
+      const outputPath = "docs/scan/repo_index.jsonl"
+      const progressPath = "docs/scan/embed_progress.json"
+      const errorPath = "docs/scan/embed_errors.jsonl"
+
+      if (!fs.existsSync(scanPath)) {
+        console.log("❌ scan_index.jsonl not found. 먼저 스캔모드를 실행하세요.")
+        return
+      }
+
+      const scanLines = fs.readFileSync(scanPath, "utf-8").split("\n").filter(Boolean)
+
+      let lastId = null
+      if (fs.existsSync(progressPath)) {
+        const p = JSON.parse(fs.readFileSync(progressPath, "utf-8"))
+        lastId = p.lastEmbeddedId
+      }
+
+      const startIndex = lastId
+        ? scanLines.findIndex(line => JSON.parse(line).id === lastId) + 1
+        : 0
+
+      const remainingLines = scanLines.slice(startIndex)
+
+      for (const line of remainingLines) {
+        try {
+          const item = JSON.parse(line)
+
+          if (!item.summary || item.summary.trim() === "") continue
+
+          const entry = {
+            id: item.id,
+            file: item.file,
+            function: item.function,
+            summary: item.summary,
+            created_at: new Date().toISOString(),
+            source: "embed_mod@v1.0-cursor-only"
+          }
+
+          fs.appendFileSync(outputPath, JSON.stringify(entry) + "\n", "utf-8")
+          fs.writeFileSync(progressPath, JSON.stringify({ lastEmbeddedId: item.id }, null, 2), "utf-8")
+
+        } catch (err) {
+          fs.appendFileSync(errorPath, JSON.stringify({ error: err.message, raw: line }) + "\n")
+        }
+      }
+
+      console.log("✅ embed_mod completed. 저장 완료.")

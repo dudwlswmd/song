@@ -1,0 +1,110 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+rule type: agent request
+---
+title: "Scan Mode"
+module: universal
+
+keywords:
+  - scan
+  - 스캔모드
+  - 코드 요약
+  - 구조 분석
+
+trigger:
+  matchAny:
+    - "스캔모드"
+    - "scan mode"
+
+description: >
+  전체 코드베이스를 순회하면서 함수/메서드의 정의를 추출하고,
+  각 함수의 간단한 summary, 파일 위치, 고유 ID 등을 docs/scan/scan_index.jsonl에 기록합니다.
+  중단되더라도 docs/scan/scan_progress.json을 기반으로 이어서 실행할 수 있습니다.
+---
+
+onTrigger:
+  - name: scanProject
+    run: |
+      const fs = require("fs")
+      const path = require("path")
+      const crypto = require("crypto")
+
+      const ROOT_DIR = "./"  // 필요 시 소스 디렉토리로 변경
+      const SCAN_OUTPUT = "docs/scan/scan_index.jsonl"
+      const PROGRESS_FILE = "docs/scan/scan_progress.json"
+      const ERROR_FILE = "docs/scan/scan_errors.jsonl"
+
+      // 유효 확장자
+      const VALID_EXT = [".php", ".js"]
+
+      // 이미 스캔한 파일 목록
+      let scanned = new Set()
+      if (fs.existsSync(PROGRESS_FILE)) {
+        const progress = JSON.parse(fs.readFileSync(PROGRESS_FILE, "utf-8"))
+        scanned = new Set(progress.completed || [])
+      }
+
+      function hashId(file, func) {
+        const raw = `${file}::${func}`
+        const hash = crypto.createHash("md5").update(raw).digest("hex").slice(0, 8)
+        const safe = file.replace(/[\/.]/g, "-")
+        return `${safe}-${func}-${hash}`
+      }
+
+      function getAllFiles(dir, allFiles = []) {
+        const entries = fs.readdirSync(dir, { withFileTypes: true })
+        for (const entry of entries) {
+          const fullPath = path.join(dir, entry.name)
+          if (entry.isDirectory()) getAllFiles(fullPath, allFiles)
+          else if (VALID_EXT.includes(path.extname(entry.name))) allFiles.push(fullPath)
+        }
+        return allFiles
+      }
+
+      const files = getAllFiles(ROOT_DIR)
+      const remaining = files.filter(f => !scanned.has(f))
+
+      for (const file of remaining) {
+        try {
+          const content = fs.readFileSync(file, "utf-8")
+          const lines = content.split("\n")
+
+          for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim()
+
+            const phpMatch = line.match(/^function\s+([a-zA-Z0-9_]+)\s*\(/)
+            const jsMatch = line.match(/^(?:async\s+)?function\s+([a-zA-Z0-9_]+)\s*\(/)
+
+            const match = phpMatch || jsMatch
+            if (match) {
+              const functionName = match[1]
+              const id = hashId(file, functionName)
+
+              const summary = "// 이 함수는 " + functionName + "을 수행합니다."  // 추후 LLM summary로 대체 가능
+
+              const record = {
+                id,
+                file,
+                function: functionName,
+                summary,
+                created_at: new Date().toISOString(),
+                source: "scan_mod@v1.0"
+              }
+
+              fs.appendFileSync(SCAN_OUTPUT, JSON.stringify(record) + "\n", "utf-8")
+            }
+          }
+
+          // 완료 목록에 추가
+          scanned.add(file)
+          fs.writeFileSync(PROGRESS_FILE, JSON.stringify({ completed: Array.from(scanned) }, null, 2), "utf-8")
+
+        } catch (err) {
+          fs.appendFileSync(ERROR_FILE, JSON.stringify({ file, error: err.message }) + "\n")
+        }
+      }
+
+      console.log("✅ 스캔모드 완료됨. 결과:", SCAN_OUTPUT)

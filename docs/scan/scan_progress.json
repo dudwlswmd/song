@@ -1,0 +1,22 @@
+{
+  "completed": [
+    "scan_temp.js",
+    "src/App.js",
+    "src/App.test.js",
+    "src/components/Button.js",
+    "src/components/Card.js",
+    "src/constants/index.js",
+    "src/hooks/useLocalStorage.js",
+    "src/index.js",
+    "src/layouts/Footer.js",
+    "src/layouts/Header.js",
+    "src/layouts/Layout.js",
+    "src/pages/About.js",
+    "src/pages/Contact.js",
+    "src/pages/Home.js",
+    "src/pages/룰.js",
+    "src/reportWebVitals.js",
+    "src/setupTests.js",
+    "src/utils/helpers.js"
+  ]
+}
